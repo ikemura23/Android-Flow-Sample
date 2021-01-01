@@ -1,17 +1,16 @@
 package com.ikemura.android_flow_sample
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.ikemura.android_flow_sample.databinding.ActivityMainBinding
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private val newsViewModel = NewsViewModel(NewsRepository()) // 仮
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,13 +21,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startFlow() {
-        lifecycleScope.launch {
-            val myFlow = flow<String> {
-                delay(1000)
-                emit("hello flow")
-            }
 
-            myFlow.collect { binding.textView.text = it }
+        lifecycleScope.launchWhenCreated {
+            newsViewModel.uiState.collect { uiState ->
+                when (uiState) {
+                    is LatestNewsUiState.Success -> showFavoriteNews(uiState.news)
+                    is LatestNewsUiState.Error -> showError(uiState.exception)
+                }
+            }
         }
+    }
+
+    private fun showFavoriteNews(news: List<String>) {
+        Toast.makeText(this, news.toString(), Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showError(exception: Throwable) {
+        Toast.makeText(this, exception.toString(), Toast.LENGTH_SHORT).show()
     }
 }
