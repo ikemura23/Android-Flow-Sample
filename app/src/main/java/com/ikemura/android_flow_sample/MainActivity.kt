@@ -2,7 +2,7 @@ package com.ikemura.android_flow_sample
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.coroutines.GlobalScope
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startFlow() {
-        GlobalScope.launch {
+        lifecycleScope.launch {
             val myFlow = flow<String> {
                 delay(1000)
                 emit("hello flow")
