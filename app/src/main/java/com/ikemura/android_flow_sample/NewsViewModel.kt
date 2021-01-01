@@ -14,8 +14,8 @@ class NewsViewModel(
     private val newsRepository: NewsRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(LatestNewsUiState.Success(emptyList()))
-    val uiState: StateFlow<LatestNewsUiState> = _uiState
+    private val _uiState = MutableStateFlow<LatestNewsUiState?>(null)
+    val uiState: StateFlow<LatestNewsUiState?> = _uiState
 
     init {
         viewModelScope.launch {
