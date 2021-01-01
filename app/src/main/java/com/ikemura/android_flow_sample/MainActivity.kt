@@ -3,15 +3,20 @@ package com.ikemura.android_flow_sample
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.ikemura.android_flow_sample.databinding.ActivityMainBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         startFlow()
     }
@@ -23,7 +28,7 @@ class MainActivity : AppCompatActivity() {
                 emit("hello flow")
             }
 
-            myFlow.collect { println(it) }
+            myFlow.collect { binding.textView.text = it }
         }
     }
 }
