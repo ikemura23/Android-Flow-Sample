@@ -15,3 +15,10 @@ class NewsRepositoryImpl : NewsRepository {
         emit(listOf("a", "b", "c", "d"))
     }
 }
+
+class FakeNewsRepositoryImpl:NewsRepository {
+    override fun observeFavoriteLatestNews(): Flow<List<String>> = flow {
+        delay(2000)
+        emit(listOf("a", "b", "c", "d"))
+    }
+}
