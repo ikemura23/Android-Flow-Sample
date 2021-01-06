@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.collect
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val newsViewModel = NewsViewModel(NewsRepository()) // 仮
+    private val newsViewModel = NewsViewModel(NewsRepositoryImpl()) // 仮
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

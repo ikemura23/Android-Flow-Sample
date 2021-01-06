@@ -4,9 +4,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class NewsRepository {
+interface NewsRepository {
+    fun observeFavoriteLatestNews(): Flow<List<String>>
+}
 
-    val favoriteLatestNews: Flow<List<String>> = flow {
+class NewsRepositoryImpl : NewsRepository {
+
+    override fun observeFavoriteLatestNews(): Flow<List<String>> = flow {
         delay(2000)
         emit(listOf("a", "b", "c", "d"))
     }

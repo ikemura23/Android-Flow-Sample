@@ -19,7 +19,7 @@ class NewsViewModel(
 
     init {
         viewModelScope.launch {
-            newsRepository.favoriteLatestNews.collect { favoriteNews ->
+            newsRepository.observeFavoriteLatestNews().collect { favoriteNews ->
                 _uiState.value = LatestNewsUiState.Success(favoriteNews)
             }
         }
