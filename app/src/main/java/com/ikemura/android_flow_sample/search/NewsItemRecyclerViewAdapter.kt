@@ -1,21 +1,16 @@
 package com.ikemura.android_flow_sample.search
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.ikemura.android_flow_sample.R
+import com.ikemura.android_flow_sample.SuggestUiModel
 
-import com.ikemura.android_flow_sample.search.dummy.DummyContent.DummyItem
+class NewsItemRecyclerViewAdapter : RecyclerView.Adapter<NewsItemRecyclerViewAdapter.ViewHolder>() {
 
-/**
- * [RecyclerView.Adapter] that can display a [DummyItem].
- * TODO: Replace the implementation with code for your data type.
- */
-class NewsItemRecyclerViewAdapter(
-    private val values: List<DummyItem>
-) : RecyclerView.Adapter<NewsItemRecyclerViewAdapter.ViewHolder>() {
+    private val uiModels = mutableListOf<SuggestUiModel>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -24,12 +19,18 @@ class NewsItemRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = values[position]
+        val item: SuggestUiModel = uiModels[position]
         holder.idView.text = item.id
-        holder.contentView.text = item.content
+        holder.contentView.text = item.name
     }
 
-    override fun getItemCount(): Int = values.size
+    override fun getItemCount(): Int = uiModels.size
+
+    fun refresh(suggestUiModels: List<SuggestUiModel>) {
+        uiModels.clear()
+        uiModels.addAll(suggestUiModels)
+        notifyDataSetChanged()
+    }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val idView: TextView = view.findViewById(R.id.item_number)

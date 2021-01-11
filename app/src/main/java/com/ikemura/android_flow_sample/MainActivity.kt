@@ -5,7 +5,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.ikemura.android_flow_sample.databinding.ActivityMainBinding
-import com.ikemura.android_flow_sample.search.NewsSearchFragment
+import com.ikemura.android_flow_sample.search.NewsSearchListFragment
 import kotlinx.coroutines.flow.collect
 
 class MainActivity : AppCompatActivity() {
@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
-            .replace(binding.container.id, NewsSearchFragment())
+            .replace(binding.container.id, NewsSearchListFragment())
             .commitNow()
 
         // startFlow()

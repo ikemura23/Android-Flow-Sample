@@ -1,6 +1,7 @@
 package com.ikemura.android_flow_sample
 
 import android.os.SystemClock
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -18,15 +19,25 @@ import java.util.Locale
 /**
  * UIから参照されるViewModel
  */
-class NewsSearchViewModel(
+class NewsSearchListViewModel(
     private val newsRepository: NewsRepository
 ) : ViewModel() {
 
     val searchText = MutableLiveData("")
 
+    // val suggestList: LiveData<List<SuggestUiModel>> = searchText.map {
+    //     val model = SuggestUiModel(
+    //         name = it,
+    //         id = it
+    //     )
+    //     listOf(model, model, model)
+    //
+    // }
+
     @ExperimentalCoroutinesApi
     val suggestList: LiveData<List<SuggestUiModel>> = searchText.asFlow()
         .distinctUntilChanged()
+        // .debounce(1000L)
         .searchWithCustomDebounce(delayMillis = 1000L)
         .asLiveData()
 
@@ -34,14 +45,13 @@ class NewsSearchViewModel(
     private fun Flow<String>.searchWithCustomDebounce(delayMillis: Long): Flow<List<SuggestUiModel>> {
         var lastEmissionTime = 0L
         return mapLatest { searchText ->
-
+            Log.d(TAG, "searchText: $searchText")
             if (searchText.isNotBlank()) {
                 val interval = SystemClock.uptimeMillis() - lastEmissionTime
                 if (interval < delayMillis) {
                     delay(delayMillis - interval)
                 }
                 lastEmissionTime = SystemClock.uptimeMillis()
-
                 newsRepository.getNews().map { it.toUiModel() }
             } else {
                 emptyList()
@@ -49,7 +59,7 @@ class NewsSearchViewModel(
         }
     }
 
-    private fun String.toUiModel() = SuggestUiModel.Item(
+    private fun String.toUiModel() = SuggestUiModel(
         name = this,
         id = getNowDate()
     )
@@ -61,11 +71,13 @@ class NewsSearchViewModel(
         val date = Date(System.currentTimeMillis())
         return SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.JAPAN).format(date)
     }
+
+    companion object {
+        private val TAG = NewsSearchListViewModel::class.java.simpleName
+    }
 }
 
-sealed class SuggestUiModel {
-    data class Item(
-        val name: String,
-        val id: String
-    ) : SuggestUiModel()
-}
+data class SuggestUiModel(
+    val name: String,
+    val id: String
+)
