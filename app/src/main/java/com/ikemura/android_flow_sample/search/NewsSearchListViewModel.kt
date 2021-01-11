@@ -8,8 +8,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapLatest
 import java.text.SimpleDateFormat
@@ -25,24 +27,19 @@ class NewsSearchListViewModel(
 
     val searchText = MutableLiveData("")
 
-    // val suggestList: LiveData<List<SuggestUiModel>> = searchText.map {
-    //     val model = SuggestUiModel(
-    //         name = it,
-    //         id = it
-    //     )
-    //     listOf(model, model, model)
-    //
-    // }
-
+    @FlowPreview
     @ExperimentalCoroutinesApi
     val suggestList: LiveData<List<SuggestUiModel>> = searchText.asFlow()
         .distinctUntilChanged()
-        // .debounce(1000L)
-        .searchWithCustomDebounce(delayMillis = 1000L)
+        .debounce(1000L)
+        // .searchWithCustomDebounce(delayMillis = 1000L)
+        .searchWithCustomDebounce()
         .asLiveData()
 
+    // delay中に新しい値が入力されたらキャンセルされるためAPIを連続して呼び出すことがない
+    // delayMillisを指定した場合、APIリクエストを遅延させる（標準関数のdebounceは値を捨ててしまう）
     @ExperimentalCoroutinesApi
-    private fun Flow<String>.searchWithCustomDebounce(delayMillis: Long): Flow<List<SuggestUiModel>> {
+    private fun Flow<String>.searchWithCustomDebounce(delayMillis: Long = 0L): Flow<List<SuggestUiModel>> {
         var lastEmissionTime = 0L
         return mapLatest { searchText ->
             Log.d(TAG, "searchText: $searchText")
@@ -52,7 +49,7 @@ class NewsSearchListViewModel(
                     delay(delayMillis - interval)
                 }
                 lastEmissionTime = SystemClock.uptimeMillis()
-                newsRepository.getNews().map { it.toUiModel() }
+                newsRepository.getNews(searchText).map { it.toUiModel() }
             } else {
                 emptyList()
             }
